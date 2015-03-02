@@ -30,9 +30,9 @@ unlock_mutex:
 
 	ldr r1 , =unlocked		@set r1 to be unlocked
 	str r1 , [r0]			@set current status to be unlocked
-        
-        @ END CODE INSERT
 	bx lr				@return
+
+        @ END CODE INSERT
 	.size unlock_mutex, .-unlock_mutex
 
 	.end
