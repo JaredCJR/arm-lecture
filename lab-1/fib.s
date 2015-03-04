@@ -4,32 +4,49 @@
 	.align 2
 	.thumb
 	.thumb_func
+
 	.global fibonacci
 	.type fibonacci, function
 
 fibonacci:
 	@ ADD/MODIFY CODE BELOW
 	@ PROLOG
-	@r0 is the passed value
-	push {r3,r4,r5,r6,lr}
-	mov r3,#-1		@r3==previous
-	mov r4,#1		@r4==result
-	mov r5,#0		@r5==sum
-	mov r6,#0		@r6==i (in for loop)
-for_loop:
-	add r5,r4,r3	@sum = result + previous
-	mov r3,r4		@previous = result
-	mov r4,r5		@result = sum
-	add r6,r6,#1	@i=i+1
+	push {r3, r4, r5, lr}
 
-	CMP r0,r6		@x-i>0  means i<x 
-	it ge			@if i<=x
-	bge for_loop	@next cycle
+	@ R4 = R0 - 0 (update flags)
+	subs r4, r0, #0
+	@ if(R0 <= 0) goto .L3 (which returns 0)
+	ble .L3	
 	
-	mov r0,r5		@r0 is the return value
-	pop {r3,r4,r5,r6,pc}
-	
+	@ Compare R4 wtih 1
+	cmp r4, #1
+	@ If R4 == 1 goto .L4 (which returns 1)
+	beq .L4
+
+	@ R0 = R4 - 1
+	sub r0, r4, #1
+	@ Recursive call to fibonacci with R4 - 1 as parameter
+	bl fibonacci
+
+	@ R5 = R0
+	@ R0 = R4 - 2
+	mov r5, r0
+	sub r0, r4, #2
+	@ Recursive call to fibonacci with R4 - 2 as parameter
+	bl fibonacci
+
+	@ R0 = R5 + R0 (update flags)
+	adds r0, r5
+	pop {r3, r4, r5, pc}		@EPILOG
+
+	@ END CODE MODIFICATION
+.L3:
+	mov r0, #0			@ R0 = 0
+	pop {r3, r4, r5, pc}		@ EPILOG
+
+.L4:
+	mov r0, #1			@ R0 = 1
+	pop {r3, r4, r5, pc}		@ EPILOG
+
 	.size fibonacci, .-fibonacci
 	.end
-	
-	
